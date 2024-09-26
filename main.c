@@ -4,19 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-unsigned long int collatz_conjecture(unsigned long int num) {
-    unsigned long int steps = 0;
-    while (num != 1) {
-        if (num % 2 == 0) {
-            num = num / 2;
-        } else {
-            num = 3 * num + 1;
-        }
-        steps++;
-    }
-    return steps;
-}
+#include "cache.h"
 
 int main (int argc, char *argv[]) {
 
@@ -27,7 +15,7 @@ int main (int argc, char *argv[]) {
     FILE *file = fopen("collatz.csv", "w");
 
     fprintf(file, "Random Number,Steps\n");
-    for (unsigned long int i = 0; i < num_of_values; i++) {
+    for (unsigned long int ix = 0; ix < num_of_values; ix++) {
         unsigned long int random_num = MIN + rand() % (MAX - MIN + 1);
         unsigned long int steps = collatz_conjecture(random_num);
         fprintf(file, "%lu,%lu\n", random_num, steps);
