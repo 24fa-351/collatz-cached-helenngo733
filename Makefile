@@ -1,8 +1,8 @@
-collatz: collatz.c
-	gcc -o collatz collatz.c
+main: main.c
+	gcc -o main main.c cache.c
 
 clean:
-	rm collatz
+	rm main
 
-test: collatz
+test: main
 	bash test.sh
