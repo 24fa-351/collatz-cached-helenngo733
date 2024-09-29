@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
     unsigned long int MIN = strtoul(argv[2], NULL, 10);
     unsigned long int MAX = strtoul(argv[3], NULL, 10);
     int cache_policy = atoi(argv[4]);
-    int cache_size = atoi(argv[5]);
+    unsigned long int cache_size = atoi(argv[5]);
 
     initialize_cache(cache_size);
     collatz_func_ptr provider = collatz_conjecture_provider;
@@ -33,5 +33,11 @@ int main (int argc, char *argv[]) {
         fprintf(file, "%lu,%lu\n", random_num, steps);
     }
     fclose(file);
+
+    double cache_hit_percentage = calculate_cache();
+    printf("Cache Hit Percentage: %.2f%%\n", cache_hit_percentage);
+
+    free_cache();
+
     return 0;
 }

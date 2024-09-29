@@ -4,11 +4,15 @@
 #include "cache.h"
 
 //not sure if its safe to use static but it works for now
-static CacheEntry *cache = 0; 
+static CacheEntry *cache = NULL; 
 static int cache_size = 0;  
-static int current = 0;
+static int counter = 0;
 
-void initialize_cache(int cache_size) {
+static unsigned long int cache_hits = 0;
+static unsigned long int cache_misses = 0;
+
+void initialize_cache(unsigned long int size) {
+    cache_size = size;
     cache = (CacheEntry *)  malloc(cache_size * sizeof(CacheEntry));
     for (int ix = 0; ix < cache_size; ix++) {
         cache[ix].num = 0;
@@ -22,13 +26,14 @@ void initialize_cache(int cache_size) {
 unsigned long int lookup(unsigned long int num) {
     for (int ix = 0; ix < cache_size;  ix++) {
         if (cache[ix].num == num && cache[ix].valid_entry) {
-            if (cache[ix].recent != 0) {
-                cache[ix].recent =  current++;
-            }
+            cache_hits++;
+            cache[ix].recent =  counter++;
+            cache[ix].frequency++;
             return cache[ix].steps;
         }
     }
-    return 0; 
+    cache_misses++;
+    return 0; //entry not found
 }
 
 void insert(unsigned long int num, unsigned long int steps, int cache_policy) {
@@ -36,15 +41,13 @@ void insert(unsigned long int num, unsigned long int steps, int cache_policy) {
     entry->num = num;
     entry ->steps = steps; 
     entry ->valid_entry = true;
+    
     if (cache_policy == LFU) {
-        if (entry->frequency == 0) {
-            entry->frequency = 1;
-        } else {
-            entry->frequency++;
-        }
-        entry->frequency = 1; 
+        entry->frequency = 1;
     }
-    entry-> recent = current++; 
+    if (cache_policy == LRU) {
+        entry->recent = counter++; 
+    }
 }
 
 void evict(CacheEntry *entry) {
@@ -52,11 +55,14 @@ void evict(CacheEntry *entry) {
 }
 
 CacheEntry *findEntryToEvict(int cache_policy) {
-    CacheEntry *evict = &cache[0];
-    for ( int ix = 1; ix < cache_size; ix++ ) { 
+    CacheEntry *evict = NULL;
+    for ( int ix = 0; ix < cache_size; ix++ ) { 
         if (!cache[ix].valid_entry) {
             return &cache[ix]; 
         }
+        if (evict == NULL) {
+            evict = &cache[ix];
+        } 
         if (cache_policy == LRU && cache[ix].recent < evict->recent) {
             evict = &cache[ix];
         } else if (cache_policy == LFU && cache[ix].frequency < evict->frequency) {
@@ -87,3 +93,11 @@ unsigned long int collatz_conjecture(unsigned long int num,int cache_policy, col
     }
     return steps;
 }
+
+double calculate_cache() {
+    return (double)cache_hits / (cache_hits + cache_misses) * 100;
+}
+
+void free_cache() {
+    free(cache);
+} 
