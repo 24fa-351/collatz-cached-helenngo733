@@ -17,7 +17,6 @@ void initialize_cache(unsigned long int size) {
     for (int ix = 0; ix < cache_size; ix++) {
         cache[ix].num = 0;
         cache[ix].steps =  0;
-        cache[ix].frequency = 0;
         cache[ix].recent = 0;
         cache[ix].valid_entry = false;
     }
@@ -27,8 +26,7 @@ unsigned long int lookup(unsigned long int num) {
     for (int ix = 0; ix < cache_size;  ix++) {
         if (cache[ix].num == num && cache[ix].valid_entry) {
             cache_hits++;
-            cache[ix].recent =  counter++;
-            cache[ix].frequency++;
+            cache[ix].recent = counter++; //update for LRU & MRU
             return cache[ix].steps;
         }
     }
@@ -41,13 +39,7 @@ void insert(unsigned long int num, unsigned long int steps, int cache_policy) {
     entry->num = num;
     entry ->steps = steps; 
     entry ->valid_entry = true;
-    
-    if (cache_policy == LFU) {
-        entry->frequency = 1;
-    }
-    if (cache_policy == LRU) {
-        entry->recent = counter++; 
-    }
+    entry->recent = counter++;
 }
 
 void evict(CacheEntry *entry) {
@@ -65,7 +57,7 @@ CacheEntry *findEntryToEvict(int cache_policy) {
         } 
         if (cache_policy == LRU && cache[ix].recent < evict->recent) {
             evict = &cache[ix];
-        } else if (cache_policy == LFU && cache[ix].frequency < evict->frequency) {
+        } else if (cache_policy == MRU && cache[ix].recent > evict->recent) {
             evict= &cache[ix];
         }
     }

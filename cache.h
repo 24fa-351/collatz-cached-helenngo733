@@ -5,13 +5,12 @@
 
 #define NONE 0
 #define LRU 1
-#define LFU 2
+#define MRU 2
 
 typedef struct {
     unsigned long int num;
     unsigned long int steps;
-    unsigned long int frequency; // For LFU
-    unsigned long int recent;    // For LRU
+    unsigned long int recent;  // For LRU & MRU
     bool valid_entry; 
 } CacheEntry;
 

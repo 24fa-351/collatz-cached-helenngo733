@@ -1,6 +1,6 @@
 //Helen Ngo
 //September 17, 2024 
-//Collatz conjecture, LRU & LFU cached
+//Collatz conjecture, LRU & MRU cached
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
     unsigned long int MIN = strtoul(argv[2], NULL, 10);
     unsigned long int MAX = strtoul(argv[3], NULL, 10);
     int cache_policy = atoi(argv[4]);
-    unsigned long int cache_size = atoi(argv[5]);
+    unsigned long int cache_size = strtoul(argv[5], NULL, 10);
 
     initialize_cache(cache_size);
     collatz_func_ptr provider = collatz_conjecture_provider;
